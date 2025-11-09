@@ -1,11 +1,12 @@
 package com.el_jobru.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.el_jobru.models.User;
-import com.el_jobru.models.UserRole;
+import com.el_jobru.models.user.User;
+import com.el_jobru.models.user.UserRole;
 import com.el_jobru.repository.UserRepository;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import io.javalin.http.UnauthorizedResponse;
 import io.javalin.security.RouteRole;
 
 import java.util.Map;
@@ -27,16 +28,14 @@ public class AuthMiddleware {
         // Pega o token do header
         String authHeader = ctx.header("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            ctx.status(HttpStatus.UNAUTHORIZED).json(Map.of("error", "Token não fornecido ou mal formatado."));
-            return;
+            throw new UnauthorizedResponse("Token não fornecido ou mal formatado");
         }
         String token = authHeader.substring(7);
 
         // Valida o token
         DecodedJWT decodedTokenOpt = tokenService.validateJwt(token);
-        if (decodedTokenOpt.getToken().isEmpty()) {
-            ctx.status(HttpStatus.UNAUTHORIZED).json(Map.of("error", "Token inválido ou expirado."));
-            return;
+        if (decodedTokenOpt == null) {
+            throw new UnauthorizedResponse("Token inválido ou expirado");
         }
 
         String tokenRole = tokenService.getRole(decodedTokenOpt);
@@ -44,15 +43,13 @@ public class AuthMiddleware {
 
         // Verifica a role do token
         if (!permittedRoles.contains(UserRole.valueOf(tokenRole))) {
-            ctx.status(HttpStatus.FORBIDDEN).json(Map.of("error", "Acesso negado. Permissões insuficientes."));
-            return;
+            throw new UnauthorizedResponse("Acesso negado. Permissão insuficiente.");
         }
 
         // Busca o usuário no banco
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
-            ctx.status(HttpStatus.UNAUTHORIZED).json(Map.of("error", "Usuário do token não encontrado."));
-            return;
+            throw new UnauthorizedResponse("Usuário do token não encontrado");
         }
 
         // Anexa o usuário ao contexto para uso no Controller

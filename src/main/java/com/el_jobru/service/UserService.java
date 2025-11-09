@@ -2,8 +2,7 @@ package com.el_jobru.service;
 
 import com.el_jobru.dto.LoginDTO;
 import com.el_jobru.dto.RegisterDTO;
-import com.el_jobru.models.User;
-import com.el_jobru.models.UserRole;
+import com.el_jobru.models.user.*;
 import com.el_jobru.repository.UserRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -20,7 +19,22 @@ public class UserService {
     }
 
     public User registerUser(RegisterDTO registerDTO) throws Exception {
-        if (userRepository.findByEmail(registerDTO.email()).isPresent()) {
+
+        Email email;
+        Password password;
+        Age age;
+
+        try {
+
+            email = new Email(registerDTO.email());
+            password = Password.createPasswordFromPlainText(registerDTO.password());
+            age = new Age(registerDTO.age());
+
+        } catch (IllegalArgumentException e) {
+            throw new Exception("Dados de registro inválidos: " + e.getMessage());
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new Exception("Email já cadastrado");
         }
 
@@ -28,16 +42,24 @@ public class UserService {
 
         User newUser = new User();
         newUser.setName(registerDTO.name());
-        newUser.setEmail(registerDTO.email());
-        newUser.setPassword(hashedPassword);
+        newUser.setEmail(email);
+        newUser.setPassword(password);
         newUser.setRole(UserRole.USER);
-        newUser.setAge(registerDTO.age());
+        newUser.setAge(age);
 
         return userRepository.save(newUser);
     }
 
     public Optional<User> validateLogin(LoginDTO loginDTO) {
-        Optional<User> userOptional = userRepository.findByEmail(loginDTO.email());
+        Email email;
+
+        try {
+            email = new Email(loginDTO.email());
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
             return Optional.empty();
@@ -45,7 +67,7 @@ public class UserService {
 
         User user = userOptional.get();
 
-        if (BCrypt.checkpw(loginDTO.password(), user.getPassword())) {
+        if (user.getPassword().matches(loginDTO.password())) {
             return Optional.of(user);
         }
 

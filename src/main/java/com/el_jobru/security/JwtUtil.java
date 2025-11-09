@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.el_jobru.models.User;
+import com.el_jobru.models.user.User;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.time.Instant;
@@ -58,7 +58,7 @@ public class JwtUtil {
                 .withSubject(user.getId().toString())
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(expire))
-                .withClaim("email", user.getEmail())
+                .withClaim("email", user.getEmail().value())
                 .withClaim("role", user.getRole().toString())
 
                 .sign(this.algorithm);

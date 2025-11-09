@@ -2,7 +2,7 @@ package com.el_jobru;
 
 import com.el_jobru.controller.AuthController;
 import com.el_jobru.db.HibernateUtil;
-import com.el_jobru.models.UserRole;
+import com.el_jobru.models.user.UserRole;
 import com.el_jobru.repository.UserRepository;
 import com.el_jobru.security.JwtUtil;
 import com.el_jobru.service.UserService;
@@ -32,10 +32,11 @@ public class MainApplication {
         Javalin app = Javalin.create(config -> {
                     config.jsonMapper(new JavalinJackson());
                     config.http.defaultContentType = "application/json";
+
                 })
                 .start(8080);
 
-        app.before(ctx -> authMiddleware(ctx, tokenService, userRepository));
+        app.beforeMatched(ctx -> authMiddleware(ctx, tokenService, userRepository));
 
         app.get("/", ctx -> ctx.result("Hello, world"));
         app.get("/hello", ctx -> ctx.result("Bem-vindo"), UserRole.USER);
@@ -43,8 +44,8 @@ public class MainApplication {
         app.post("/register", authController::register, UserRole.ANYONE);
         app.post("/login", authController::login, UserRole.ANYONE);
 
-        app.get("/profile", authController::getProfile, UserRole.USER);
-        app.get("/admin/dashboard", ctx -> ctx.status(HttpStatus.OK).result("Bem-vindo, Admin"));
+        app.get("/profile", authController::getProfile, UserRole.USER, UserRole.ADMIN);
+        app.get("/admin/dashboard", ctx -> ctx.status(HttpStatus.OK).result("Bem-vindo, Admin"), UserRole.ADMIN);
 
     }
 }

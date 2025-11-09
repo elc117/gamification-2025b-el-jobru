@@ -3,11 +3,12 @@ package com.el_jobru.controller;
 import com.el_jobru.dto.LoginDTO;
 import com.el_jobru.dto.LoginResponseDTO;
 import com.el_jobru.dto.RegisterDTO;
-import com.el_jobru.models.User;
+import com.el_jobru.models.user.User;
 import com.el_jobru.security.JwtUtil;
 import com.el_jobru.service.UserService;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import io.javalin.http.UnauthorizedResponse;
 
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class AuthController {
         Optional<User> userOptional = userService.validateLogin(loginDTO);
 
         if (userOptional.isEmpty()) {
-            ctx.status(HttpStatus.UNAUTHORIZED).json(Map.of("error", "Email ou senha inválidos!"));
+            throw new UnauthorizedResponse("Email ou senha inválidos");
         }
 
         User user = userOptional.get();

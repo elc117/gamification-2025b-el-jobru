@@ -1,4 +1,4 @@
-package com.el_jobru.models;
+package com.el_jobru.models.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -16,19 +16,22 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "email", nullable = false, unique = true))
+    private Email email;
 
-    @Column(nullable = false)
+    @Embedded
+    @AttributeOverride(name = "hash", column = @Column(name = "password", nullable = false))
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
+    private Password password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
-    @Column
-    private int age;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "age"))
+    private Age age;
 
     public User() {}
 
@@ -48,27 +51,27 @@ public class User {
         this.name = name;
     }
 
-    public String getEmail() {
+    public Email getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(Email email) {
         this.email = email;
     }
 
-    public String getPassword() {
+    public Password getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(Password password) {
         this.password = password;
     }
 
-    public int getAge() {
+    public Age getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Age age) {
         this.age = age;
     }
 

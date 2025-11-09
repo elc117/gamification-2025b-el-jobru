@@ -1,4 +1,4 @@
-package com.el_jobru.models;
+package com.el_jobru.models.user;
 
 import io.javalin.security.RouteRole;
 
