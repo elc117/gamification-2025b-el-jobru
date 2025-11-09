@@ -1,5 +1,6 @@
 package com.el_jobru.models.user;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
@@ -9,4 +10,11 @@ public record Age(int value) {
             throw new IllegalArgumentException("Idade inválida: " + value);
         }
     }
+
+    @JsonValue
+    @Override
+    public int value() {
+        return value;
+    }
+
 }

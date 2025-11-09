@@ -32,7 +32,6 @@ public class MainApplication {
         Javalin app = Javalin.create(config -> {
                     config.jsonMapper(new JavalinJackson());
                     config.http.defaultContentType = "application/json";
-
                 })
                 .start(8080);
 
