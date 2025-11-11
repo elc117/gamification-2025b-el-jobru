@@ -1,16 +1,19 @@
 package com.el_jobru.service;
 
-import com.el_jobru.dto.LoginDTO;
-import com.el_jobru.dto.RegisterDTO;
+import com.el_jobru.db.HibernateUtil;
+import com.el_jobru.dto.auth.LoginDTO;
+import com.el_jobru.dto.auth.RegisterDTO;
+import com.el_jobru.dto.profile.ProfileResponseDTO;
+import com.el_jobru.models.book.Book;
 import com.el_jobru.models.user.*;
 import com.el_jobru.repository.UserRepository;
-import org.mindrot.jbcrypt.BCrypt;
+import io.javalin.http.NotFoundResponse;
+import jakarta.persistence.EntityManager;
+import org.hibernate.Hibernate;
 
 import java.util.Optional;
 
 public class UserService {
-
-    // TODO -> Adicionar validações e regras de negócio na camada Service/DAO
 
     private final UserRepository userRepository;
 
@@ -37,8 +40,6 @@ public class UserService {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new Exception("Email já cadastrado");
         }
-
-        String hashedPassword = BCrypt.hashpw(registerDTO.password(), BCrypt.gensalt());
 
         User newUser = new User();
         newUser.setName(registerDTO.name());
@@ -72,5 +73,35 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+
+    public ProfileResponseDTO getUserProfile(User user) {
+        try (EntityManager em = HibernateUtil.getEntityManager()) {
+            User managedUser = em.merge(user);
+
+            Hibernate.initialize(managedUser.getBooks());
+
+            return new ProfileResponseDTO(managedUser);
+        }
+    }
+
+    public ProfileResponseDTO addBookToUser(User user, long bookId) {
+        try (EntityManager em = HibernateUtil.getEntityManager()) {
+            em.getTransaction().begin();
+
+            User managedUser = em.merge(user);
+
+            Book book = em.find(Book.class, bookId);
+            if (book == null) {
+                em.getTransaction().rollback();
+                throw new NotFoundResponse("Livro não encontrado");
+            }
+
+            managedUser.addBook(book);
+
+            em.getTransaction().commit();
+
+            return new ProfileResponseDTO(managedUser);
+        }
     }
 }

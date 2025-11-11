@@ -1,18 +1,15 @@
 package com.el_jobru.security;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.el_jobru.models.user.User;
 import com.el_jobru.models.user.UserRole;
 import com.el_jobru.repository.UserRepository;
 import io.javalin.http.Context;
-import io.javalin.http.HttpStatus;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.security.RouteRole;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class AuthMiddleware {
 
@@ -32,14 +29,16 @@ public class AuthMiddleware {
         }
         String token = authHeader.substring(7);
 
-        // Valida o token
-        DecodedJWT decodedTokenOpt = tokenService.validateJwt(token);
-        if (decodedTokenOpt == null) {
+        DecodedJWT decodedToken;
+        try {
+            // Valida o token
+             decodedToken = tokenService.validateJwt(token);
+        } catch (JWTVerificationException e) {
             throw new UnauthorizedResponse("Token inválido ou expirado");
         }
 
-        String tokenRole = tokenService.getRole(decodedTokenOpt);
-        UUID userId = tokenService.getSubject(decodedTokenOpt);
+        String tokenRole = tokenService.getRole(decodedToken);
+        UUID userId = tokenService.getSubject(decodedToken);
 
         // Verifica a role do token
         if (!permittedRoles.contains(UserRole.valueOf(tokenRole))) {

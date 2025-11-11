@@ -1,10 +1,13 @@
 package com.el_jobru;
 
-import com.el_jobru.controller.AuthController;
+import com.el_jobru.controller.UserController;
+import com.el_jobru.controller.BookController;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.models.user.UserRole;
+import com.el_jobru.repository.BookRepository;
 import com.el_jobru.repository.UserRepository;
 import com.el_jobru.security.JwtUtil;
+import com.el_jobru.service.BookService;
 import com.el_jobru.service.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.javalin.Javalin;
@@ -25,9 +28,12 @@ public class MainApplication {
 
         //Injeção de Dependência (manualmente)
         UserRepository userRepository = new UserRepository();
+        BookRepository bookRepository = new BookRepository();
         JwtUtil tokenService = JwtUtil.getInstance();
         UserService userService = new UserService(userRepository);
-        AuthController authController = new AuthController(userService, tokenService);
+        BookService bookService = new BookService(bookRepository);
+        UserController userController = new UserController(userService, tokenService);
+        BookController bookController = new BookController(bookService);
 
         Javalin app = Javalin.create(config -> {
                     config.jsonMapper(new JavalinJackson());
@@ -40,11 +46,15 @@ public class MainApplication {
         app.get("/", ctx -> ctx.result("Hello, world"));
         app.get("/hello", ctx -> ctx.result("Bem-vindo"), UserRole.USER);
 
-        app.post("/register", authController::register, UserRole.ANYONE);
-        app.post("/login", authController::login, UserRole.ANYONE);
+        app.post("/register", userController::register, UserRole.ANYONE);
+        app.post("/login", userController::login, UserRole.ANYONE);
 
-        app.get("/profile", authController::getProfile, UserRole.USER, UserRole.ADMIN);
+        app.get("/profile", userController::getProfile, UserRole.USER, UserRole.ADMIN);
+        app.patch("/profile/book", userController::addBook, UserRole.USER, UserRole.ADMIN);
+
         app.get("/admin/dashboard", ctx -> ctx.status(HttpStatus.OK).result("Bem-vindo, Admin"), UserRole.ADMIN);
 
+        app.get("/book", bookController::getAll, UserRole.USER, UserRole.ADMIN);
+        app.post("/book", bookController::register, UserRole.USER, UserRole.ADMIN);
     }
 }

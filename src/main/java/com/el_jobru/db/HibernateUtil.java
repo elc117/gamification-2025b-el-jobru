@@ -4,6 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.hibernate.cfg.AvailableSettings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +18,9 @@ public class HibernateUtil {
 
             Map<String, String> props = new HashMap<>();
 
-            // Propriedades específicas do Hikari que o Hibernate espera
-            props.put("hibernate.hikari.jdbcUrl", dotenv.get("DB_URL"));
-            props.put("hibernate.hikari.dataSource.user", dotenv.get("DB_USER"));
-            props.put("hibernate.hikari.dataSource.password", dotenv.get("DB_PASSWORD"));
+            props.put(AvailableSettings.JAKARTA_JDBC_URL, dotenv.get("DB_URL"));
+            props.put(AvailableSettings.JAKARTA_JDBC_USER, dotenv.get("DB_USER"));
+            props.put(AvailableSettings.JAKARTA_JDBC_PASSWORD, dotenv.get("DB_PASSWORD"));
 
             props.put("hibernate.hikari.dataSource.cachePrepStmts", "true");
             props.put("hibernate.hikari.dataSource.prepStmtCacheSize", "250");

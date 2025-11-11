@@ -1,8 +1,11 @@
 package com.el_jobru.models.user;
 
+import com.el_jobru.models.book.Book;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -33,14 +36,18 @@ public class User {
     @AttributeOverride(name = "value", column = @Column(name = "age"))
     private Age age;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_books",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "book_id")
+    )
+    private Set<Book> books = new HashSet<>();
+
     public User() {}
 
     public UUID getId() {
         return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -81,5 +88,20 @@ public class User {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public Set<Book> getBooks() {
+        return books;
+    }
+
+
+    public void addBook(Book book) {
+        this.books.add(book);
+        book.getUsers().add(this);
+    }
+
+    public void removeBook(Book book) {
+        this.books.remove(book);
+        book.getUsers().remove(this);
     }
 }
