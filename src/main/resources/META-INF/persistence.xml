@@ -9,6 +9,7 @@
 
         <class>com.el_jobru.models.user.User</class>
         <class>com.el_jobru.models.book.Book</class>
+        <class>com.el_jobru.models.level.Level</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
