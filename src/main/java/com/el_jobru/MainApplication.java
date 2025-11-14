@@ -1,13 +1,16 @@
 package com.el_jobru;
 
+import com.el_jobru.controller.DiaryController;
 import com.el_jobru.controller.UserController;
 import com.el_jobru.controller.BookController;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.models.user.UserRole;
 import com.el_jobru.repository.BookRepository;
+import com.el_jobru.repository.DiaryRepository;
 import com.el_jobru.repository.UserRepository;
 import com.el_jobru.security.JwtUtil;
 import com.el_jobru.service.BookService;
+import com.el_jobru.service.DiaryService;
 import com.el_jobru.service.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.javalin.Javalin;
@@ -29,11 +32,14 @@ public class MainApplication {
         //Injeção de Dependência (manualmente)
         UserRepository userRepository = new UserRepository();
         BookRepository bookRepository = new BookRepository();
+        DiaryRepository diaryRepository = new DiaryRepository();
         JwtUtil tokenService = JwtUtil.getInstance();
         UserService userService = new UserService(userRepository);
         BookService bookService = new BookService(bookRepository);
+        DiaryService diaryService = new DiaryService(diaryRepository);
         UserController userController = new UserController(userService, tokenService);
         BookController bookController = new BookController(bookService);
+        DiaryController diaryController = new DiaryController(diaryService);
 
         Javalin app = Javalin.create(config -> {
                     config.jsonMapper(new JavalinJackson());
@@ -56,5 +62,7 @@ public class MainApplication {
 
         app.get("/book", bookController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/book", bookController::register, UserRole.USER, UserRole.ADMIN);
+
+        app.post("/diary", diaryController::register, UserRole.USER, UserRole.ADMIN);
     }
 }

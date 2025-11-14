@@ -1,8 +1,10 @@
-package com.el_jobru.models.Chapter;
+package com.el_jobru.models.chapter;
 
 import com.el_jobru.models.diary.Diary;
 import jakarta.persistence.*;
 
+@Entity
+@Table(name = "chapters")
 public class Chapter {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -19,6 +21,8 @@ public class Chapter {
     @JoinColumn(name = "diaryId")
     private Diary diary;
 
+    public Chapter() {}
+
     public Chapter(String title, String content, Diary diary) {
         if (title.isEmpty()) {
             this.title = "Untitled";
@@ -29,9 +33,7 @@ public class Chapter {
         this.diary = diary;
     }
 
-    public long getId() { return id; }
-
-    public void setId(long id) { this.id = id; }
+    public Long getId() { return id; }
 
     public String getContent() { return content; }
 
