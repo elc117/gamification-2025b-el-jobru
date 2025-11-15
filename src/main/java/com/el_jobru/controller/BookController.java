@@ -25,7 +25,7 @@ public class BookController {
 
             BookResponseDTO bookResponse = new BookResponseDTO(newBook);
 
-            ctx.status(HttpStatus.OK).json(bookResponse);
+            ctx.status(HttpStatus.CREATED).json(bookResponse);
 
         } catch (Exception e) {
             throw new BadRequestResponse("Erro: " + e);

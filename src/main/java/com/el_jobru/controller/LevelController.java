@@ -23,7 +23,7 @@ public class LevelController {
 
             Level newLevel = levelService.registerLevel(levelDTO);
 
-            ctx.status(HttpStatus.OK).json(newLevel);
+            ctx.status(HttpStatus.CREATED).json(newLevel);
         } catch (Exception e) {
             throw new BadRequestResponse("Erro: " + e);
         }
