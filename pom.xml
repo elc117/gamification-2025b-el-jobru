@@ -31,7 +31,7 @@
         </plugins>
     </build>
 
-    <groupId>com.eljobru</groupId>
+    <groupId>com.el_jobru</groupId>
     <artifactId>el-jobru</artifactId>
     <version>1.0</version>
 
