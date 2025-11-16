@@ -1,0 +1,12 @@
+# Arquivos e pastas do Git
+.git
+.gitignore
+
+# Pasta de build do Maven
+/target
+
+# Arquivos do IntelliJ
+.idea
+
+# Arquivos .env (nunca devem ir para o build)
+.env

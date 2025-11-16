@@ -1,31 +1,32 @@
-# Estágio 1: Build (Usando Maven com Temurin JDK 21)
-FROM maven:3-eclipse-temurin-21 AS build
+# --- Estágio 1: Build (Construção) ---
+# Usamos uma imagem que já tem o Maven e o JDK 21
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+# Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Cachear dependências
+# Copia o pom.xml primeiro. Isso aproveita o cache do Docker.
 COPY pom.xml .
-RUN mvn dependency:go-offline
 
-# Copiar código e compilar
+# Copia o resto do código-fonte
 COPY src ./src
-RUN mvn clean install -DskipTests
 
-# *** NOVO PASSO ***
-# Copiar dependências para uma pasta 'lib'
-RUN mvn dependency:copy-dependencies -DoutputDirectory=target/lib
+# Roda o build do Maven (usando o shade plugin) para criar o "fat jar"
+# Isso criará o JAR em /app/target/el-jobru-1.0.jar
+RUN mvn clean package -DskipTests
 
-# Estágio 2: Run (Usando Temurin JRE 21 - a alternativa ao openjdk)
+# --- Estágio 2: Run (Execução) ---
+# Usamos uma imagem JRE (só para rodar) enxuta com Java 21
 FROM eclipse-temurin:21-jre-alpine
+
 WORKDIR /app
-EXPOSE 8080
 
-# Copiar o JAR fino (só o seu código)
-COPY --from=build /app/target/el-jobru-1.0.jar app.jar
+# Copia apenas o "fat jar" do estágio de build para a imagem final
+# Renomeamos para app.jar por simplicidade
+COPY --from=builder /app/target/el-jobru-1.0.jar /app/app.jar
 
-# Copiar todas as dependências (incluindo postgresql.jar)
-COPY --from=build /app/target/lib ./lib
+# Expõe a porta que o Render espera para serviços Docker
+EXPOSE 10000
 
-# *** ENTRYPOINT MODIFICADO ***
-# Usamos -cp (classpath) para incluir o app.jar e tudo na pasta lib/
-# Substitua 'com.el_jobru.MainApplication' se o nome da sua classe principal for outro
-ENTRYPOINT [ "java", "-cp", "app.jar:lib/*", "com.el_jobru.MainApplication" ]
+# Comando para iniciar a aplicação quando o container subir
+CMD ["java", "-jar", "/app/app.jar"]
