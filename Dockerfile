@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=builder /app/target/el-jobru-1.0.jar /app/app.jar
 
 # Expõe a porta que o Render espera para serviços Docker
-EXPOSE 10000
+EXPOSE 8080
 
 # Comando para iniciar a aplicação quando o container subir
 CMD ["java", "-jar", "/app/app.jar"]
