@@ -6,6 +6,8 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.hibernate.cfg.AvailableSettings;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,23 +17,31 @@ public class HibernateUtil {
     static {
         try {
             Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
-
             Map<String, String> props = new HashMap<>();
 
-            String dbUrl = getEnv(dotenv, "DB_URL");
-            String dbUser = getEnv(dotenv, "DB_USER");
-            String dbPass = getEnv(dotenv, "DB_PASSWORD");
+            String databaseUrl = getEnv(dotenv, "DB_URL");
 
-            if (dbUrl == null) {
-                throw new RuntimeException("ERRO: DB_URL não definida no .env ou nas variáveis de ambiente.");
-            }
-            if (dbUser == null) {
-                throw new RuntimeException("ERRO: DB_USER não definida no .env ou nas variáveis de ambiente.");
+            if (databaseUrl == null) {
+                throw new RuntimeException("ERRO: DATABASE_URL não definida no .env ou nas variáveis de ambiente.");
             }
 
-            props.put(AvailableSettings.JAKARTA_JDBC_URL, dbUrl);
-            props.put(AvailableSettings.JAKARTA_JDBC_USER, dbUser);
-            props.put(AvailableSettings.JAKARTA_JDBC_PASSWORD, dbPass);
+            try {
+                URI dbUri = new URI(databaseUrl);
+
+                String username = dbUri.getUserInfo().split(":")[0];
+                String password = dbUri.getUserInfo().split(":")[1];
+
+                // Construir a URL JDBC correta (adicionando "jdbc:")
+                String jdbcUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
+
+                props.put(AvailableSettings.JAKARTA_JDBC_URL, jdbcUrl);
+                props.put(AvailableSettings.JAKARTA_JDBC_USER, username);
+                props.put(AvailableSettings.JAKARTA_JDBC_PASSWORD, password);
+
+            } catch (URISyntaxException e) {
+                System.err.println("Formato da DATABASE_URL inválido: " + databaseUrl);
+                throw new RuntimeException("Erro ao parsear DATABASE_URL", e);
+            }
 
             props.put("hibernate.hikari.dataSource.cachePrepStmts", "true");
             props.put("hibernate.hikari.dataSource.prepStmtCacheSize", "250");
