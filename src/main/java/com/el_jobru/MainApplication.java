@@ -1,5 +1,6 @@
 package com.el_jobru;
 
+import com.el_jobru.controller.DiaryController;
 import com.el_jobru.controller.LevelController;
 import com.el_jobru.controller.MissionController;
 import com.el_jobru.controller.UserController;
@@ -7,6 +8,11 @@ import com.el_jobru.controller.BookController;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.models.user.UserRole;
 import com.el_jobru.repository.BookRepository;
+import com.el_jobru.repository.DiaryRepository;
+import com.el_jobru.repository.UserRepository;
+import com.el_jobru.security.JwtUtil;
+import com.el_jobru.service.BookService;
+import com.el_jobru.service.DiaryService;
 import com.el_jobru.repository.LevelRepository;
 import com.el_jobru.repository.MissionRepository;
 import com.el_jobru.repository.UserRepository;
@@ -36,6 +42,7 @@ public class MainApplication {
         //Repositories
         UserRepository userRepository = new UserRepository();
         BookRepository bookRepository = new BookRepository();
+        DiaryRepository diaryRepository = new DiaryRepository();
         LevelRepository levelRepository = new LevelRepository();
         MissionRepository missionRepository = new MissionRepository();
 
@@ -43,12 +50,14 @@ public class MainApplication {
         JwtUtil tokenService = JwtUtil.getInstance();
         UserService userService = new UserService(userRepository);
         BookService bookService = new BookService(bookRepository);
+        DiaryService diaryService = new DiaryService(diaryRepository);
         LevelService levelService = new LevelService(levelRepository);
         MissionService missionService = new MissionService(missionRepository);
-
+      
         //Controllers
         UserController userController = new UserController(userService, tokenService);
         BookController bookController = new BookController(bookService);
+        DiaryController diaryController = new DiaryController(diaryService);
         LevelController levelController = new LevelController(levelService);
         MissionController missionController = new MissionController(missionService);
 
@@ -74,6 +83,8 @@ public class MainApplication {
         app.get("/book", bookController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/book", bookController::register, UserRole.USER, UserRole.ADMIN);
 
+        app.post("/diary", diaryController::register, UserRole.USER, UserRole.ADMIN);
+      
         app.post("/level", levelController::register, UserRole.ADMIN);
         app.get("/level", levelController::getAll, UserRole.USER, UserRole.ADMIN);
 
