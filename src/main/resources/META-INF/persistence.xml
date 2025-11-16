@@ -11,6 +11,8 @@
         <class>com.el_jobru.models.book.Book</class>
         <class>com.el_jobru.models.diary.Diary</class>
         <class>com.el_jobru.models.chapter.Chapter</class>
+        <class>com.el_jobru.models.level.Level</class>
+        <class>com.el_jobru.models.mission.Mission</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
