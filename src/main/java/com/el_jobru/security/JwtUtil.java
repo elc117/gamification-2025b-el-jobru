@@ -7,7 +7,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.el_jobru.models.user.User;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -34,13 +33,24 @@ public class JwtUtil {
 
     public static void initialize(Dotenv dotenv) {
         if (instance == null) {
-            String secret = dotenv.get("JWT_SECRET");
-            String issuer = dotenv.get("JWT_ISSUER");
+            String secret = getEnv(dotenv, "JWT_SECRET");
+            String issuer = getEnv(dotenv, "JWT_ISSUER");
             if (secret == null || secret.isBlank()) {
-                throw new RuntimeException("Erro: JWT_SECRET não definido no .env");
+                throw new RuntimeException("Erro: JWT_SECRET não definido");
             }
             instance = new JwtUtil(secret, issuer);
         }
+    }
+
+    private static String getEnv(Dotenv dotenv, String key) {
+        String value = System.getenv(key);
+        if (value != null) {
+            return value;
+        }
+        if (dotenv != null) {
+            return dotenv.get(key);
+        }
+        return null;
     }
 
     public static JwtUtil getInstance() {

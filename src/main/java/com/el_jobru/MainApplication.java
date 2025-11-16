@@ -28,12 +28,18 @@ import static com.el_jobru.security.AuthMiddleware.authMiddleware;
 public class MainApplication {
     public static void main(String[] args) {
 
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
 
         HibernateUtil.getEntityManager().close();
 
+
         //Singleton: Uma das maravilhas da POO pra garantir instância única em to-do o código
         JwtUtil.initialize(dotenv);
+
+        String portEnv = System.getenv("PORT");
+        int port = (portEnv != null) ? Integer.parseInt(portEnv) : 8080;
 
         //Injeção de Dependência (manualmente)
         //Repositories
@@ -62,7 +68,7 @@ public class MainApplication {
                     config.jsonMapper(new JavalinJackson());
                     config.http.defaultContentType = "application/json";
                 })
-                .start(8080);
+                .start(port);
 
         app.beforeMatched(ctx -> authMiddleware(ctx, tokenService, userRepository));
 
