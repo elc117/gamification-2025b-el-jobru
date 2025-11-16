@@ -31,8 +31,19 @@ public class HibernateUtil {
                 String username = dbUri.getUserInfo().split(":")[0];
                 String password = dbUri.getUserInfo().split(":")[1];
 
-                // Construir a URL JDBC correta (adicionando "jdbc:")
-                String jdbcUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
+                String host = dbUri.getHost();
+                int port = dbUri.getPort(); // Isso está retornando -1
+                String path = dbUri.getPath();
+
+                String jdbcUrl;
+
+                if (port == -1) {
+                    // Se a porta for -1, omita-a. O driver usará o padrão (5432).
+                    jdbcUrl = "jdbc:postgresql://" + host + path;
+                } else {
+                    // Se a porta for especificada, inclua-a.
+                    jdbcUrl = "jdbc:postgresql://" + host + ":" + port + path;
+                }
 
                 props.put(AvailableSettings.JAKARTA_JDBC_URL, jdbcUrl);
                 props.put(AvailableSettings.JAKARTA_JDBC_USER, username);
