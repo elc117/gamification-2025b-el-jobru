@@ -7,7 +7,7 @@ COPY . .
 RUN apt-get install maven -y
 RUN mvn clean install
 
-FROM openjdk:21-jdk-alpine
+FROM openjdk:21
 
 EXPOSE 8080
 
