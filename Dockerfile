@@ -1,29 +1,22 @@
-# Build (Usando a imagem Maven oficial)
-# Esta imagem JÁ TEM Maven E JDK 21.
+# Estágio 1: Build (Usando Maven com Temurin JDK 21)
 FROM maven:3-eclipse-temurin-21 AS build
-
 WORKDIR /app
 
-# Copia os arquivos do projeto (pom.xml primeiro para cachear dependências)
+# Cachear dependências
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
-# Copia o resto do código-fonte
+# Copiar código e compilar
 COPY src ./src
-
-# Roda o build (pulando os testes para um build mais rápido no Docker)
 RUN mvn clean install -DskipTests
 
-# Run (Usando a imagem JRE, que é menor)
-# JRE (Java Runtime Environment) é o suficiente, não precisa do JDK
-FROM openjdk:21-jre-alpine
+# Estágio 2: Run (Usando Temurin JRE 21 - a alternativa ao openjdk)
+# ESTA É A LINHA QUE MUDOU:
+FROM eclipse-temurin:21-jre-alpine
 
-# Expõe a porta que o Javalin vai usar
 EXPOSE 8080
 
-# Copia APENAS o JAR compilado do estágio 'build'
-# Ajuste o nome do JAR se for diferente
+# Copiar o JAR compilado
 COPY --from=build /app/target/el-jobru-1.0.jar app.jar
 
-# Comando para rodar a aplicação
 ENTRYPOINT [ "java", "-jar", "app.jar" ]
