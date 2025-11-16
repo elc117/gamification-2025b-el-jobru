@@ -10,13 +10,22 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean install -DskipTests
 
-# Estágio 2: Run (Usando Temurin JRE 21 - a alternativa ao openjdk)
-# ESTA É A LINHA QUE MUDOU:
-FROM eclipse-temurin:21-jre-alpine
+# *** NOVO PASSO ***
+# Copiar dependências para uma pasta 'lib'
+RUN mvn dependency:copy-dependencies -DoutputDirectory=target/lib
 
+# Estágio 2: Run (Usando Temurin JRE 21 - a alternativa ao openjdk)
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
 EXPOSE 8080
 
-# Copiar o JAR compilado
+# Copiar o JAR fino (só o seu código)
 COPY --from=build /app/target/el-jobru-1.0.jar app.jar
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+# Copiar todas as dependências (incluindo postgresql.jar)
+COPY --from=build /app/target/lib ./lib
+
+# *** ENTRYPOINT MODIFICADO ***
+# Usamos -cp (classpath) para incluir o app.jar e tudo na pasta lib/
+# Substitua 'com.el_jobru.MainApplication' se o nome da sua classe principal for outro
+ENTRYPOINT [ "java", "-cp", "app.jar:lib/*", "com.el_jobru.MainApplication" ]
