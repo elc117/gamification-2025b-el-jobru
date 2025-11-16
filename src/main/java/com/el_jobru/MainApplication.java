@@ -67,6 +67,9 @@ public class MainApplication {
         Javalin app = Javalin.create(config -> {
                     config.jsonMapper(new JavalinJackson());
                     config.http.defaultContentType = "application/json";
+                    config.bundledPlugins.enableCors( cors -> cors.addRule(corsRule -> corsRule.allowHost("http://127.0.0.1:5500"))
+
+                    );
                 })
                 .start(port);
 
