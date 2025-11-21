@@ -28,6 +28,25 @@ public class DiaryRepository {
         }
     }
 
+    public Diary update(Diary diary) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+            em.merge(diary);
+            transaction.commit();
+            return diary;
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
     public void delete(Diary diary) {
         EntityManager em = HibernateUtil.getEntityManager();
         EntityTransaction transaction = em.getTransaction();

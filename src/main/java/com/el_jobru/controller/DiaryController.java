@@ -16,7 +16,7 @@ public class DiaryController {
         try {
             RegisterDiaryDTO dto = ctx.bodyAsClass(RegisterDiaryDTO.class);
 
-            Diary diary = diaryService.registerDiary(dto);
+            Diary diary = diaryService.registerDiary(dto, ctx.attribute("currentUser"));
 
             DiaryResponseDTO diaryResponse = new DiaryResponseDTO(diary);
 
@@ -24,6 +24,10 @@ public class DiaryController {
         } catch (Exception e) {
             throw new BadRequestResponse("Erro: " + e);
         }
+    }
+
+    public void registerChapter(Context ctx) {
+
     }
 
 }

@@ -1,6 +1,8 @@
 package com.el_jobru.service;
 
+import com.el_jobru.dto.chapter.RegisterChapterDTO;
 import com.el_jobru.dto.diary.RegisterDiaryDTO;
+import com.el_jobru.models.chapter.Chapter;
 import com.el_jobru.models.diary.Diary;
 import com.el_jobru.models.user.User;
 import com.el_jobru.repository.DiaryRepository;
@@ -13,10 +15,7 @@ public class DiaryService {
 
     public DiaryService(DiaryRepository diaryRepository) { this.diaryRepository = diaryRepository; }
 
-    public Diary registerDiary(RegisterDiaryDTO diaryDTO) {
-        UserRepository userRepository = new UserRepository();
-        Optional<User> optAuthor = userRepository.findById(diaryDTO.authorId());
-        User author = optAuthor.orElseThrow(() -> new RuntimeException("Usuário não está registrado."));
+    public Diary registerDiary(RegisterDiaryDTO diaryDTO, User author) {
         Diary diary = new Diary(diaryDTO.title(), author);
         return diaryRepository.save(diary);
     }

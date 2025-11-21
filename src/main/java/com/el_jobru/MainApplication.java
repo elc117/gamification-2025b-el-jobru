@@ -1,23 +1,11 @@
 package com.el_jobru;
 
-import com.el_jobru.controller.DiaryController;
-import com.el_jobru.controller.LevelController;
-import com.el_jobru.controller.MissionController;
-import com.el_jobru.controller.UserController;
-import com.el_jobru.controller.BookController;
+import com.el_jobru.controller.*;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.models.user.UserRole;
-import com.el_jobru.repository.BookRepository;
-import com.el_jobru.repository.DiaryRepository;
-import com.el_jobru.repository.UserRepository;
+import com.el_jobru.repository.*;
 import com.el_jobru.security.JwtUtil;
-import com.el_jobru.service.BookService;
-import com.el_jobru.service.DiaryService;
-import com.el_jobru.repository.LevelRepository;
-import com.el_jobru.repository.MissionRepository;
-import com.el_jobru.service.LevelService;
-import com.el_jobru.service.MissionService;
-import com.el_jobru.service.UserService;
+import com.el_jobru.service.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.javalin.Javalin;
 import io.javalin.http.HttpStatus;
@@ -45,6 +33,7 @@ public class MainApplication {
         UserRepository userRepository = new UserRepository();
         BookRepository bookRepository = new BookRepository();
         DiaryRepository diaryRepository = new DiaryRepository();
+        ChapterRepository chapterRepository = new ChapterRepository();
         LevelRepository levelRepository = new LevelRepository();
         MissionRepository missionRepository = new MissionRepository();
 
@@ -53,6 +42,7 @@ public class MainApplication {
         UserService userService = new UserService(userRepository);
         BookService bookService = new BookService(bookRepository);
         DiaryService diaryService = new DiaryService(diaryRepository);
+        ChapterService chapterService = new ChapterService(chapterRepository);
         LevelService levelService = new LevelService(levelRepository);
         MissionService missionService = new MissionService(missionRepository);
       
@@ -60,6 +50,7 @@ public class MainApplication {
         UserController userController = new UserController(userService, tokenService);
         BookController bookController = new BookController(bookService);
         DiaryController diaryController = new DiaryController(diaryService);
+        ChapterController chapterController = new ChapterController(chapterService);
         LevelController levelController = new LevelController(levelService);
         MissionController missionController = new MissionController(missionService);
 
@@ -86,7 +77,7 @@ public class MainApplication {
 
         app.get("/profile", userController::getProfile, UserRole.USER, UserRole.ADMIN);
         app.patch("/profile/book", userController::addBook, UserRole.USER, UserRole.ADMIN);
-        app.patch("mission/claim", userController::accomplishedMission, UserRole.USER, UserRole.ADMIN);
+        app.patch("/mission/claim", userController::accomplishedMission, UserRole.USER, UserRole.ADMIN);
 
         app.get("/admin/dashboard", ctx -> ctx.status(HttpStatus.OK).result("Bem-vindo, Admin"), UserRole.ADMIN);
 
@@ -94,6 +85,8 @@ public class MainApplication {
         app.post("/book", bookController::register, UserRole.USER, UserRole.ADMIN);
 
         app.post("/diary", diaryController::register, UserRole.USER, UserRole.ADMIN);
+
+        app.post("/chapter", chapterController::register, UserRole.USER, UserRole.ADMIN);
       
         app.post("/level", levelController::register, UserRole.ADMIN);
         app.get("/level", levelController::getAll, UserRole.USER, UserRole.ADMIN);
