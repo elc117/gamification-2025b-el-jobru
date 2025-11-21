@@ -1,6 +1,7 @@
 package com.el_jobru.dto.profile;
 
 import com.el_jobru.dto.book.BookResponseDTO;
+import com.el_jobru.models.level.Level;
 import com.el_jobru.models.user.User;
 
 import java.util.Set;
@@ -13,7 +14,9 @@ public class ProfileResponseDTO {
     private String email;
     private String role;
     private int age;
+    private Long xp;
     private Set<BookResponseDTO> books;
+    private Level lvl;
 
     public ProfileResponseDTO(User user) {
         this.id = user.getId();
@@ -21,6 +24,8 @@ public class ProfileResponseDTO {
         this.email = user.getEmail().value();
         this.role = user.getRole().toString();
         this.age = user.getAge().value();
+        this.xp = user.getExp();
+        this.lvl = user.getLvl();
 
         this.books = user.getBooks().stream()
                 .map(BookResponseDTO::new)
@@ -46,6 +51,8 @@ public class ProfileResponseDTO {
     public int getAge() {
         return age;
     }
+
+    public Long getXp() { return xp; }
 
     public Set<BookResponseDTO> getBooks() {
         return books;

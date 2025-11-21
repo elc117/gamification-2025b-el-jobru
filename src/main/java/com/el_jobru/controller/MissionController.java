@@ -2,6 +2,7 @@ package com.el_jobru.controller;
 
 import com.el_jobru.dto.mission.MissionDTO;
 import com.el_jobru.dto.mission.MissionResponseDTO;
+import com.el_jobru.dto.profile.ProfileResponseDTO;
 import com.el_jobru.service.MissionService;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;

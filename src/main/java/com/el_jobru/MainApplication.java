@@ -34,7 +34,6 @@ public class MainApplication {
 
         HibernateUtil.getEntityManager().close();
 
-
         //Singleton: Uma das maravilhas da POO pra garantir instância única em to-do o código
         JwtUtil.initialize(dotenv);
 
@@ -87,6 +86,7 @@ public class MainApplication {
 
         app.get("/profile", userController::getProfile, UserRole.USER, UserRole.ADMIN);
         app.patch("/profile/book", userController::addBook, UserRole.USER, UserRole.ADMIN);
+        app.patch("mission/claim", userController::accomplishedMission, UserRole.USER, UserRole.ADMIN);
 
         app.get("/admin/dashboard", ctx -> ctx.status(HttpStatus.OK).result("Bem-vindo, Admin"), UserRole.ADMIN);
 

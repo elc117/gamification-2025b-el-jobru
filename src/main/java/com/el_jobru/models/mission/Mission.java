@@ -20,6 +20,9 @@ public class Mission {
     @Column
     private Integer reward;
 
+    @Column
+    private Boolean accomplished;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "min_level_id")
     private Level minLevel;
@@ -68,4 +71,6 @@ public class Mission {
     public void setMinLevel(Level minLevel) {
         this.minLevel = minLevel;
     }
+
+    public void setStatus(Boolean status) { this.accomplished = status; }
 }

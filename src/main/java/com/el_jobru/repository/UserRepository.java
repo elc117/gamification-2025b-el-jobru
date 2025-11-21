@@ -30,6 +30,23 @@ public class UserRepository {
         }
     }
 
+    public User update(User user) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            em.merge(user);
+            transaction.commit();
+            return user;
+        }
+        catch (Exception e) {
+            if (transaction.isActive()) { transaction.rollback(); }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
     public Optional<User> findByEmail(Email email) {
         try (EntityManager em = HibernateUtil.getEntityManager()) {
             return em.createQuery("SELECT u FROM User u WHERE u.email.value = :emailValue", User.class)

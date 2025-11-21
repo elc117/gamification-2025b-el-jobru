@@ -1,6 +1,7 @@
 package com.el_jobru.models.user;
 
 import com.el_jobru.models.book.Book;
+import com.el_jobru.models.level.Level;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
@@ -19,6 +20,9 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Column
+    private Long exp;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "email", nullable = false, unique = true))
     private Email email;
@@ -36,6 +40,10 @@ public class User {
     @AttributeOverride(name = "value", column = @Column(name = "age"))
     private Age age;
 
+    @ManyToOne
+    @JoinColumn(name = "level_id")
+    private Level lvl;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_books",
@@ -45,6 +53,16 @@ public class User {
     private Set<Book> books = new HashSet<>();
 
     public User() {}
+
+    public User(Age age, String name, Long exp, Email email, Password password, UserRole role, Level lvl){
+        this.age = age;
+        this.name = name;
+        this.exp = exp;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.lvl = lvl;
+    }
 
     public UUID getId() {
         return id;
@@ -57,6 +75,10 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Long getExp() { return exp; }
+
+    public void setExp(Long exp) { this.exp = exp; }
 
     public Email getEmail() {
         return email;
@@ -89,6 +111,10 @@ public class User {
     public void setRole(UserRole role) {
         this.role = role;
     }
+
+    public Level getLvl() { return lvl; }
+
+    public void setLvl(Level lvl) { this.lvl = lvl; }
 
     public Set<Book> getBooks() {
         return books;

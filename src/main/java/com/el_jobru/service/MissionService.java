@@ -3,9 +3,12 @@ package com.el_jobru.service;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.dto.mission.MissionDTO;
 import com.el_jobru.dto.mission.MissionResponseDTO;
+import com.el_jobru.dto.profile.ProfileResponseDTO;
 import com.el_jobru.models.level.Level;
 import com.el_jobru.models.mission.Mission;
+import com.el_jobru.models.user.User;
 import com.el_jobru.repository.MissionRepository;
+import com.el_jobru.repository.UserRepository;
 import io.javalin.http.NotFoundResponse;
 import jakarta.persistence.EntityManager;
 

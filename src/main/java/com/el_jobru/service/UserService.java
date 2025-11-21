@@ -3,9 +3,14 @@ package com.el_jobru.service;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.dto.auth.LoginDTO;
 import com.el_jobru.dto.auth.RegisterDTO;
+import com.el_jobru.dto.mission.MissionDTO;
 import com.el_jobru.dto.profile.ProfileResponseDTO;
 import com.el_jobru.models.book.Book;
+import com.el_jobru.models.level.Level;
+import com.el_jobru.models.mission.Mission;
 import com.el_jobru.models.user.*;
+import com.el_jobru.repository.LevelRepository;
+import com.el_jobru.repository.MissionRepository;
 import com.el_jobru.repository.UserRepository;
 import io.javalin.http.NotFoundResponse;
 import jakarta.persistence.EntityManager;
@@ -26,6 +31,7 @@ public class UserService {
         Email email;
         Password password;
         Age age;
+        Long exp = (long) 0;
 
         try {
 
@@ -41,12 +47,8 @@ public class UserService {
             throw new Exception("Email já cadastrado");
         }
 
-        User newUser = new User();
-        newUser.setName(registerDTO.name());
-        newUser.setEmail(email);
-        newUser.setPassword(password);
-        newUser.setRole(UserRole.USER);
-        newUser.setAge(age);
+        LevelRepository repo = new LevelRepository();
+        User newUser = new User(age, registerDTO.name(), exp, email, password, UserRole.USER, repo.findById(1));
 
         return userRepository.save(newUser);
     }
@@ -103,5 +105,37 @@ public class UserService {
 
             return new ProfileResponseDTO(managedUser);
         }
+    }
+
+    public ProfileResponseDTO claimMission(MissionDTO missionDTO, User user) {
+        MissionRepository missionRepository = new MissionRepository();
+        Mission mission = missionRepository.findByTitle(missionDTO.title());
+
+        mission.setStatus(true);
+        missionRepository.update(mission);
+
+        Long newExp = user.getExp() + missionDTO.reward();
+        user.setExp(newExp);
+        user = this.lvlUp(user);
+
+        return new ProfileResponseDTO(
+                userRepository.update(user)
+        );
+    }
+
+    public User lvlUp(User user){
+        if(user.getExp() <= user.getLvl().getMaxXp()) { return user; }
+
+        LevelRepository repo =  new LevelRepository();
+        Level newLvl = repo.findById(user.getLvl().getId()+1);
+
+        if(newLvl != null) {
+            user.setLvl(newLvl);
+        }
+        else {
+            System.out.println("Nível máximo atingido.");
+        }
+
+        return user;
     }
 }
