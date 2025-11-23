@@ -11,7 +11,7 @@ import io.javalin.http.Context;
 import java.util.List;
 
 public class ChapterController {
-    private ChapterService chapterService;
+    private final ChapterService chapterService;
 
     public ChapterController(ChapterService chapterService) { this.chapterService = chapterService; }
 
@@ -22,6 +22,30 @@ public class ChapterController {
             Chapter chapter = chapterService.registerChapter(chapterDTO);
 
             ctx.status(200).json(chapter);
+        } catch (Exception e) {
+            throw new BadRequestResponse("Erro: " + e);
+        }
+    }
+
+    public void update(Context ctx) {
+        try {
+            ChapterResponseDTO chapterDTO = ctx.bodyAsClass(ChapterResponseDTO.class);
+
+            Chapter chapter = chapterService.updateChapter(chapterDTO);
+
+            ctx.status(200).json(chapter);
+        } catch (Exception e) {
+            throw new BadRequestResponse("Erro: " + e);
+        }
+    }
+
+    public void delete(Context ctx) {
+        try {
+            ChapterResponseDTO chapterDTO = ctx.bodyAsClass(ChapterResponseDTO.class);
+
+            chapterService.deleteChapter(chapterDTO);
+
+            ctx.status(200).json(chapterDTO);
         } catch (Exception e) {
             throw new BadRequestResponse("Erro: " + e);
         }

@@ -27,7 +27,27 @@ public class ChapterRepository {
             throw e;
         } finally {
             em.close();
-        }}
+        }
+    }
+
+    public Chapter update(Chapter chapter) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+            em.persist(chapter);
+            transaction.commit();
+            return chapter;
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 
     public void delete(Chapter chapter) {
         EntityManager em = HibernateUtil.getEntityManager();
@@ -40,8 +60,9 @@ public class ChapterRepository {
         } catch (Exception e) {
             transaction.rollback();
             e.printStackTrace();
+        } finally {
+            em.close();
         }
-        finally { em.close(); }
     }
 
     public Optional<Chapter> findById(long id) {
@@ -54,7 +75,7 @@ public class ChapterRepository {
     }
 
     public List<Chapter> findAllDiary(Long id) {
-        try(EntityManager em = HibernateUtil.getEntityManager()) {
+        try (EntityManager em = HibernateUtil.getEntityManager()) {
             return em.createQuery("SELECT c FROM Chapter c WHERE c.diary.id = :id", Chapter.class)
                     .setParameter("id", id)
                     .getResultList();

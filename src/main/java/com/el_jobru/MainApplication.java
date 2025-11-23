@@ -1,6 +1,11 @@
 package com.el_jobru;
 
-import com.el_jobru.controller.*;
+import com.el_jobru.controller.UserController;
+import com.el_jobru.controller.BookController;
+import com.el_jobru.controller.ChapterController;
+import com.el_jobru.controller.LevelController;
+import com.el_jobru.controller.MissionController;
+import com.el_jobru.controllerNew.controller.DiaryController;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.models.user.UserRole;
 import com.el_jobru.repository.*;
@@ -54,6 +59,7 @@ public class MainApplication {
         LevelController levelController = new LevelController(levelService);
         MissionController missionController = new MissionController(missionService);
 
+
         Javalin app = Javalin.create(config -> {
                     config.jsonMapper(new JavalinJackson());
                     config.http.defaultContentType = "application/json";
@@ -86,14 +92,19 @@ public class MainApplication {
 
         app.get("/diary", diaryController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/diary", diaryController::register, UserRole.USER, UserRole.ADMIN);
+        app.put("/diary", diaryController::update, UserRole.USER, UserRole.ADMIN);
+        app.delete("/diary", diaryController::delete, UserRole.USER, UserRole.ADMIN);
 
         app.get("/chapter", chapterController::getDiaryAll, UserRole.USER, UserRole.ADMIN);
         app.post("/chapter", chapterController::register, UserRole.USER, UserRole.ADMIN);
+        app.put("/chapter", chapterController::update, UserRole.USER, UserRole.ADMIN);
+        app.delete("/chapter", chapterController::delete, UserRole.USER, UserRole.ADMIN);
       
         app.post("/level", levelController::register, UserRole.ADMIN);
         app.get("/level", levelController::getAll, UserRole.USER, UserRole.ADMIN);
 
         app.post("/mission", missionController::register, UserRole.ADMIN);
+       // app.delete("/mission", missionController::delete, UserRole.ADMIN);
         app.get("/mission", missionController::getAll, UserRole.USER, UserRole.ADMIN);
     }
 }

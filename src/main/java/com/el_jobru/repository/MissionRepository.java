@@ -1,16 +1,11 @@
 package com.el_jobru.repository;
 
 import com.el_jobru.db.HibernateUtil;
-import com.el_jobru.models.level.Level;
 import com.el_jobru.models.mission.Mission;
-import com.el_jobru.models.user.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.NoResultException;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 public class MissionRepository {
     public Mission save(Mission mission) {

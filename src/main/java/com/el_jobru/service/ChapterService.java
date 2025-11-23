@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ChapterService {
-    private ChapterRepository chapterRepository;
+    private final ChapterRepository chapterRepository;
 
     public ChapterService(ChapterRepository chapterRepository) { this.chapterRepository = chapterRepository; }
 
@@ -25,6 +25,14 @@ public class ChapterService {
         return chapterRepository.save(chapter);
     }
 
+    public Chapter updateChapter(ChapterResponseDTO chapterDTO) {
+        Optional<Chapter> optChapter = chapterRepository.findById(chapterDTO.id());
+
+        return chapterRepository.update(
+                optChapter.orElseThrow(() -> new RuntimeException("Capítulo não encontrado."))
+        );
+    }
+
     public List<ChapterResponseDTO> findDiaryChapters(DiaryResponseDTO diaryDTO) {
         List<ChapterResponseDTO> chapters = chapterRepository.findAllDiary(diaryDTO.getId())
                 .stream()
@@ -32,5 +40,12 @@ public class ChapterService {
                 .toList();
 
         return chapters;
+    }
+
+    public void deleteChapter (ChapterResponseDTO chapterDTO) {
+        Optional<Chapter> optDeleted = chapterRepository.findById(chapterDTO.id());
+        Chapter chapDeleted = optDeleted.orElseThrow(() -> new RuntimeException("Capítulo não existe."));
+
+        chapterRepository.delete(chapDeleted);
     }
 }
