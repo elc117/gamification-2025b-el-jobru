@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ChapterRepository {
@@ -49,6 +50,14 @@ public class ChapterRepository {
             return Optional.of(chapter);
         } catch (NoResultException e) {
             return Optional.empty();
+        }
+    }
+
+    public List<Chapter> findAllDiary(Long id) {
+        try(EntityManager em = HibernateUtil.getEntityManager()) {
+            return em.createQuery("SELECT c FROM Chapter c WHERE c.diary.id = :id", Chapter.class)
+                    .setParameter("id", id)
+                    .getResultList();
         }
     }
 }

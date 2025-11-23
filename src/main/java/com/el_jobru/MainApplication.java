@@ -84,8 +84,10 @@ public class MainApplication {
         app.get("/book", bookController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/book", bookController::register, UserRole.USER, UserRole.ADMIN);
 
+        app.get("/diary", diaryController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/diary", diaryController::register, UserRole.USER, UserRole.ADMIN);
 
+        app.get("/chapter", chapterController::getDiaryAll, UserRole.USER, UserRole.ADMIN);
         app.post("/chapter", chapterController::register, UserRole.USER, UserRole.ADMIN);
       
         app.post("/level", levelController::register, UserRole.ADMIN);
