@@ -1,11 +1,12 @@
 package com.el_jobru.models.chapter;
 
+import com.el_jobru.models.BaseObject;
 import com.el_jobru.models.diary.Diary;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "chapters")
-public class Chapter {
+public class Chapter implements BaseObject<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -33,6 +34,7 @@ public class Chapter {
         this.diary = diary;
     }
 
+    @Override
     public Long getId() { return id; }
 
     public String getContent() { return content; }

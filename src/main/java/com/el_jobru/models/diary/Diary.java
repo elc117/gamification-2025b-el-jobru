@@ -1,5 +1,6 @@
 package com.el_jobru.models.diary;
 
+import com.el_jobru.models.BaseObject;
 import com.el_jobru.models.chapter.Chapter;
 import com.el_jobru.models.user.User;
 import jakarta.persistence.*;
@@ -9,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "diaries")
-public class Diary {
+public class Diary implements BaseObject<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -35,6 +36,7 @@ public class Diary {
         this.author = author;
     }
 
+    @Override
     public Long getId() { return id; }
 
     public User getAuthor() { return author; }

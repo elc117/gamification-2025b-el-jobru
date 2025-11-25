@@ -1,25 +1,27 @@
 package com.el_jobru.repository;
 
 import com.el_jobru.db.HibernateUtil;
-import com.el_jobru.models.chapter.Chapter;
-import com.el_jobru.models.diary.Diary;
+import com.el_jobru.models.BaseObject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 
-import java.util.List;
 import java.util.Optional;
 
-public class ChapterRepository {
-    public Chapter save(Chapter chapter) {
+public interface Repository<O extends BaseObject<ID>, ID> {
+
+    default O saveOrUpdate(O object){
         EntityManager em = HibernateUtil.getEntityManager();
         EntityTransaction transaction = em.getTransaction();
-
         try {
             transaction.begin();
-            em.persist(chapter);
+            if(object.getId() == null) {
+                em.persist(object);
+            } else {
+                return em.merge(object);
+            }
             transaction.commit();
-            return chapter;
+            return object;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -27,37 +29,30 @@ public class ChapterRepository {
             throw e;
         } finally {
             em.close();
-        }}
+        }
+    }
 
-    public void delete(Chapter chapter) {
+    default void delete(O object){
         EntityManager em = HibernateUtil.getEntityManager();
         EntityTransaction transaction = em.getTransaction();
-
         try {
             transaction.begin();
-            em.remove(chapter);
+            em.remove(object);
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
             e.printStackTrace();
+        } finally {
+            em.close();
         }
-        finally { em.close(); }
     }
 
-    public Optional<Chapter> findById(Long id) {
-        try (EntityManager em = HibernateUtil.getEntityManager()) {
-            Chapter chapter = em.find(Chapter.class, id);
-            return Optional.of(chapter);
+    default Optional<O> findById(ID id, Class<O> entityClass) {
+        try(EntityManager em = HibernateUtil.getEntityManager()){
+            O object = em.find(entityClass, id);
+            return Optional.of(object);
         } catch (NoResultException e) {
             return Optional.empty();
-        }
-    }
-
-    public List<Chapter> findAllDiary(Long id) {
-        try(EntityManager em = HibernateUtil.getEntityManager()) {
-            return em.createQuery("SELECT c FROM Chapter c WHERE c.diary.id = :id", Chapter.class)
-                    .setParameter("id", id)
-                    .getResultList();
         }
     }
 }

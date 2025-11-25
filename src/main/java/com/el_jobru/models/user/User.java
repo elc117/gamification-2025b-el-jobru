@@ -1,5 +1,6 @@
 package com.el_jobru.models.user;
 
+import com.el_jobru.models.BaseObject;
 import com.el_jobru.models.book.Book;
 import com.el_jobru.models.level.Level;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements BaseObject<UUID> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false, unique = true)
@@ -64,6 +65,7 @@ public class User {
         this.lvl = lvl;
     }
 
+    @Override
     public UUID getId() {
         return id;
     }
