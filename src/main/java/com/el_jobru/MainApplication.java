@@ -69,7 +69,7 @@ public class MainApplication {
 
         app.beforeMatched(ctx -> authMiddleware(ctx, tokenService, userRepository));
 
-        app.get("/", ctx -> ctx.result("Hello, world"));
+        app.get("/", ctx -> ctx.result("Hello, world!"));
         app.get("/hello", ctx -> ctx.result("Bem-vindo"), UserRole.USER);
 
         app.post("/register", userController::register, UserRole.ANYONE);

@@ -35,7 +35,7 @@ public class LevelService {
 
         Level level = new Level(levelDTO.name(), nextLevelMinXp, levelDTO.maxXp());
 
-        return levelRepository.save(level);
+        return levelRepository.saveOrUpdate(level);
     }
 
     public List<LevelResponseDTO> getAllLevels() {

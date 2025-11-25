@@ -48,9 +48,11 @@ public class UserService {
         }
 
         LevelRepository repo = new LevelRepository();
-        User newUser = new User(age, registerDTO.name(), exp, email, password, UserRole.USER, repo.findById(1));
+        Optional<Level> optLvl = repo.findById(1, Level.class);
+        Level lvlOne =  optLvl.orElseThrow(() -> new RuntimeException("Erro ao buscar primeiro nível."));
+        User newUser = new User(age, registerDTO.name(), exp, email, password, UserRole.USER, lvlOne);
 
-        return userRepository.save(newUser);
+        return userRepository.saveOrUpdate(newUser);
     }
 
     public Optional<User> validateLogin(LoginDTO loginDTO) {
@@ -112,14 +114,14 @@ public class UserService {
         Mission mission = missionRepository.findByTitle(missionDTO.title());
 
         mission.setStatus(true);
-        missionRepository.update(mission);
+        missionRepository.saveOrUpdate(mission);
 
         Long newExp = user.getExp() + missionDTO.reward();
         user.setExp(newExp);
         user = this.lvlUp(user);
 
         return new ProfileResponseDTO(
-                userRepository.update(user)
+                userRepository.saveOrUpdate(user)
         );
     }
 
@@ -127,7 +129,8 @@ public class UserService {
         if(user.getExp() <= user.getLvl().getMaxXp()) { return user; }
 
         LevelRepository repo =  new LevelRepository();
-        Level newLvl = repo.findById(user.getLvl().getId()+1);
+        Optional<Level> optLvl = repo.findById(user.getLvl().getId()+1, Level.class);
+        Level newLvl = optLvl.orElseThrow(() -> new RuntimeException("Nível não existe."));
 
         if(newLvl != null) {
             user.setLvl(newLvl);
