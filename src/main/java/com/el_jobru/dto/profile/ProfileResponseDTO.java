@@ -25,7 +25,6 @@ public class ProfileResponseDTO {
         this.role = user.getRole().toString();
         this.age = user.getAge().value();
         this.xp = user.getExp();
-        this.lvl = user.getLvl();
 
         this.books = user.getBooks().stream()
                 .map(BookResponseDTO::new)

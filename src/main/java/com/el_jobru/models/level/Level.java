@@ -23,9 +23,6 @@ public class Level implements BaseObject<Integer> {
     @Column(name = "max_xp")
     private long maxXp;
 
-    @OneToMany(mappedBy = "lvl")
-    private List<User> users;
-
     public Level() {}
 
     public Level(String name, long minXp, long maxXp) {

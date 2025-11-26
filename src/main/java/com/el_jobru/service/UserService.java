@@ -3,7 +3,8 @@ package com.el_jobru.service;
 import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.dto.auth.LoginDTO;
 import com.el_jobru.dto.auth.RegisterDTO;
-import com.el_jobru.dto.mission.MissionDTO;
+import com.el_jobru.dto.level.LevelResponseDTO;
+import com.el_jobru.dto.profile.ClaimMissionResponseDTO;
 import com.el_jobru.dto.profile.ProfileResponseDTO;
 import com.el_jobru.models.book.Book;
 import com.el_jobru.models.level.Level;
@@ -47,10 +48,7 @@ public class UserService {
             throw new Exception("Email já cadastrado");
         }
 
-        LevelRepository repo = new LevelRepository();
-        Optional<Level> optLvl = repo.findById(1, Level.class);
-        Level lvlOne =  optLvl.orElseThrow(() -> new RuntimeException("Erro ao buscar primeiro nível."));
-        User newUser = new User(age, registerDTO.name(), exp, email, password, UserRole.USER, lvlOne);
+        User newUser = new User(age, registerDTO.name(), email, password, UserRole.USER);
 
         return userRepository.saveOrUpdate(newUser);
     }
@@ -109,36 +107,39 @@ public class UserService {
         }
     }
 
-    public ProfileResponseDTO claimMission(MissionDTO missionDTO, User user) {
+    public ClaimMissionResponseDTO claimMission(Integer id, User user) {
         MissionRepository missionRepository = new MissionRepository();
-        Mission mission = missionRepository.findByTitle(missionDTO.title());
+        LevelRepository levelRepository = new LevelRepository();
+        Optional<Mission> optionalMission = missionRepository.findById(id, Mission.class);
+        Mission mission = optionalMission.orElseThrow(() -> new RuntimeException("Missão não encontrada no banco de dados: " + id));
+
+        Optional<Level> optionalLevel = levelRepository.findById(mission.getMinLevel().getId(), Level.class);
+        Level missionLevel = optionalLevel.orElseThrow(() -> new RuntimeException("Missão não encontrada no banco de dados: " + mission.getMinLevel().getId()));
+
+        if (user.getExp() > missionLevel.getMaxXp() || user.getExp() < missionLevel.getMinXp()) {
+            throw new RuntimeException("Usuário no nível inapropriado para essa missão!");
+        }
 
         mission.setStatus(true);
         missionRepository.saveOrUpdate(mission);
 
-        Long newExp = user.getExp() + missionDTO.reward();
+        Long newExp = user.getExp() + mission.getReward();
         user.setExp(newExp);
-        user = this.lvlUp(user);
 
-        return new ProfileResponseDTO(
-                userRepository.saveOrUpdate(user)
+        User savedUser = userRepository.saveOrUpdate(user);
+        return new ClaimMissionResponseDTO(
+                savedUser.getName(),
+                savedUser.getExp(),
+                savedUser.getEmail().value()
         );
     }
 
-    public User lvlUp(User user){
-        if(user.getExp() <= user.getLvl().getMaxXp()) { return user; }
+    public LevelResponseDTO getUserLevel(Long userXp) {
+        LevelRepository levelRepository = new LevelRepository();
+        Optional<Level> optionalLevel = levelRepository.findByXp(userXp);
 
-        LevelRepository repo =  new LevelRepository();
-        Optional<Level> optLvl = repo.findById(user.getLvl().getId()+1, Level.class);
-        Level newLvl = optLvl.orElseThrow(() -> new RuntimeException("Nível não existe."));
+        Level level = optionalLevel.orElseThrow(() -> new RuntimeException("Nível para essa xp não encontrado"));
 
-        if(newLvl != null) {
-            user.setLvl(newLvl);
-        }
-        else {
-            System.out.println("Nível máximo atingido.");
-        }
-
-        return user;
+        return new LevelResponseDTO(level);
     }
 }

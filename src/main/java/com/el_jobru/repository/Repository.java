@@ -10,18 +10,43 @@ import java.util.Optional;
 
 public interface Repository<O extends BaseObject<ID>, ID> {
 
-    default O saveOrUpdate(O object){
+    default O saveOrUpdate(O object) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        O result = object;
+
+        try {
+            transaction.begin();
+
+            if (object.getId() == null) {
+                em.persist(object);
+            } else {
+                result = em.merge(object);
+            }
+
+            transaction.commit();
+            return result;
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e; // Sempre relance a exceção para o Controller saber que deu erro
+        } finally {
+            em.close();
+        }
+    }
+
+    default void delete(O object) {
         EntityManager em = HibernateUtil.getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            if(object.getId() == null) {
-                em.persist(object);
-            } else {
-                return em.merge(object);
-            }
+
+            O managedObject = em.contains(object) ? object : em.merge(object);
+            em.remove(managedObject);
+
             transaction.commit();
-            return object;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -32,27 +57,10 @@ public interface Repository<O extends BaseObject<ID>, ID> {
         }
     }
 
-    default void delete(O object){
-        EntityManager em = HibernateUtil.getEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-        try {
-            transaction.begin();
-            em.remove(object);
-            transaction.commit();
-        } catch (Exception e) {
-            transaction.rollback();
-            e.printStackTrace();
-        } finally {
-            em.close();
-        }
-    }
-
     default Optional<O> findById(ID id, Class<O> entityClass) {
-        try(EntityManager em = HibernateUtil.getEntityManager()){
+        try (EntityManager em = HibernateUtil.getEntityManager()) {
             O object = em.find(entityClass, id);
-            return Optional.of(object);
-        } catch (NoResultException e) {
-            return Optional.empty();
+            return Optional.ofNullable(object);
         }
     }
 }

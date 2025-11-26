@@ -14,8 +14,7 @@ public class Chapter implements BaseObject<Long> {
     @Column
     private String title;
 
-    @Lob
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne

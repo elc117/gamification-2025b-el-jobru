@@ -19,7 +19,7 @@ public class ChapterController {
         try {
             RegisterChapterDTO chapterDTO = ctx.bodyAsClass(RegisterChapterDTO.class);
 
-            Chapter chapter = chapterService.registerChapter(chapterDTO);
+            ChapterResponseDTO chapter = chapterService.registerChapter(chapterDTO);
 
             ctx.status(200).json(chapter);
         } catch (Exception e) {
@@ -29,9 +29,9 @@ public class ChapterController {
 
     public void getDiaryAll(Context ctx) {
         try {
-            DiaryResponseDTO diaryDTO =  ctx.bodyAsClass(DiaryResponseDTO.class);
+            Long diaryId = Long.valueOf(ctx.pathParam("diaryId"));
 
-            List<ChapterResponseDTO> chapters = chapterService.findDiaryChapters(diaryDTO);
+            List<ChapterResponseDTO> chapters = chapterService.findDiaryChapters(diaryId);
 
             ctx.status(200).json(chapters);
         } catch (Exception e) {

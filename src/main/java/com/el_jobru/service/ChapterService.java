@@ -16,17 +16,18 @@ public class ChapterService {
 
     public ChapterService(ChapterRepository chapterRepository) { this.chapterRepository = chapterRepository; }
 
-    public Chapter registerChapter(RegisterChapterDTO chapterDTO) {
+    public ChapterResponseDTO registerChapter(RegisterChapterDTO chapterDTO) {
         DiaryRepository diaryRepository = new DiaryRepository();
         Optional<Diary> optDiary = diaryRepository.findById(chapterDTO.diaryId(), Diary.class);
         Diary diary = optDiary.orElseThrow(() -> new RuntimeException("Diário não encontrado no banco de dados"));
 
         Chapter chapter = new Chapter(chapterDTO.title(), chapterDTO.content(), diary);
-        return chapterRepository.saveOrUpdate(chapter);
+        Chapter savedChapter = chapterRepository.saveOrUpdate(chapter);
+        return new ChapterResponseDTO(savedChapter);
     }
 
-    public List<ChapterResponseDTO> findDiaryChapters(DiaryResponseDTO diaryDTO) {
-        List<ChapterResponseDTO> chapters = chapterRepository.findAllDiary(diaryDTO.getId())
+    public List<ChapterResponseDTO> findDiaryChapters(Long id) {
+        List<ChapterResponseDTO> chapters = chapterRepository.findAllDiary(id)
                 .stream()
                 .map(ChapterResponseDTO::new)
                 .toList();

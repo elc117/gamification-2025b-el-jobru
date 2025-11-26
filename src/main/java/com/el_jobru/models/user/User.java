@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,10 +42,6 @@ public class User implements BaseObject<UUID> {
     @AttributeOverride(name = "value", column = @Column(name = "age"))
     private Age age;
 
-    @ManyToOne
-    @JoinColumn(name = "level_id")
-    private Level lvl;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_books",
@@ -55,14 +52,13 @@ public class User implements BaseObject<UUID> {
 
     public User() {}
 
-    public User(Age age, String name, Long exp, Email email, Password password, UserRole role, Level lvl){
+    public User(Age age, String name, Email email, Password password, UserRole role){
         this.age = age;
         this.name = name;
-        this.exp = exp;
+        this.exp = 0L;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.lvl = lvl;
     }
 
     @Override
@@ -78,7 +74,7 @@ public class User implements BaseObject<UUID> {
         this.name = name;
     }
 
-    public Long getExp() { return exp; }
+    public Long getExp() { return Objects.requireNonNullElse(exp, 0L); }
 
     public void setExp(Long exp) { this.exp = exp; }
 
@@ -113,10 +109,6 @@ public class User implements BaseObject<UUID> {
     public void setRole(UserRole role) {
         this.role = role;
     }
-
-    public Level getLvl() { return lvl; }
-
-    public void setLvl(Level lvl) { this.lvl = lvl; }
 
     public Set<Book> getBooks() {
         return books;

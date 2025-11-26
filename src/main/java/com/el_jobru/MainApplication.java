@@ -76,8 +76,8 @@ public class MainApplication {
         app.post("/login", userController::login, UserRole.ANYONE);
 
         app.get("/profile", userController::getProfile, UserRole.USER, UserRole.ADMIN);
+        app.get("/profile/level", userController::getLevel, UserRole.USER, UserRole.ADMIN);
         app.patch("/profile/book", userController::addBook, UserRole.USER, UserRole.ADMIN);
-        app.patch("/mission/claim", userController::accomplishedMission, UserRole.USER, UserRole.ADMIN);
 
         app.get("/admin/dashboard", ctx -> ctx.status(HttpStatus.OK).result("Bem-vindo, Admin"), UserRole.ADMIN);
 
@@ -87,13 +87,14 @@ public class MainApplication {
         app.get("/diary", diaryController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/diary", diaryController::register, UserRole.USER, UserRole.ADMIN);
 
-        app.get("/chapter", chapterController::getDiaryAll, UserRole.USER, UserRole.ADMIN);
+        app.get("/chapter/{diaryId}", chapterController::getDiaryAll, UserRole.USER, UserRole.ADMIN);
         app.post("/chapter", chapterController::register, UserRole.USER, UserRole.ADMIN);
-      
+
         app.post("/level", levelController::register, UserRole.ADMIN);
         app.get("/level", levelController::getAll, UserRole.USER, UserRole.ADMIN);
 
         app.post("/mission", missionController::register, UserRole.ADMIN);
         app.get("/mission", missionController::getAll, UserRole.USER, UserRole.ADMIN);
+        app.patch("/mission/claim/{missionId}", userController::accomplishedMission, UserRole.USER, UserRole.ADMIN);
     }
 }
