@@ -6,10 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ../..:/workspaces/seu-projeto:cached
+      - ..:/workspaces:cached
+    
     command: sleep infinity
     
-    network_mode: service:db
+    depends_on:
+      - db
 
   db:
     image: postgres:18-alpine
