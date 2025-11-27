@@ -27,6 +27,21 @@ OBS: Como o diagrama é muito grande, eu recomendo baixar a imagem para poder da
 ![Diagrama de Classes](https://github.com/elc117/gamification-2025b-el-jobru/blob/main/assets/DiagramaDeClasses.png)
 
 ## A Execução
+A execução do programa deve seguir os seguintes passos (usando codespaces):
+1. Instalação do maven
+    ```bash
+   sudo apt-get update
+   sudo apt-get install -y maven
+   ```
+2. Geração do jar
+    ```bash
+   mvn clean install
+   ```
+3. Executar jar
+    ```bash
+   java -jar ./target/el-jobru-1.0.jar
+   ```
+
 
 # Fontes
 BAELDUNG. Baeldung . Disponível em: https://www.baeldung.com/.
