@@ -4,64 +4,17 @@ import com.el_jobru.db.HibernateUtil;
 import com.el_jobru.models.user.Email;
 import com.el_jobru.models.user.User;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.NoResultException;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserRepository {
-    public User save(User user) {
-        EntityManager em = HibernateUtil.getEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
-        try {
-            transaction.begin();
-            em.persist(user);
-            transaction.commit();
-            return user;
-        } catch (Exception e) {
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-
-    public User update(User user) {
-        EntityManager em = HibernateUtil.getEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-        try {
-            transaction.begin();
-            em.merge(user);
-            transaction.commit();
-            return user;
-        }
-        catch (Exception e) {
-            if (transaction.isActive()) { transaction.rollback(); }
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-
+public class UserRepository implements Repository<User, UUID>{
     public Optional<User> findByEmail(Email email) {
         try (EntityManager em = HibernateUtil.getEntityManager()) {
             return em.createQuery("SELECT u FROM User u WHERE u.email.value = :emailValue", User.class)
                     .setParameter("emailValue", email.value())
                     .getResultStream()
                     .findFirst();
-        }
-    }
-
-    public Optional<User> findById(UUID id) {
-        try (EntityManager em = HibernateUtil.getEntityManager()) {
-            User user = em.find(User.class, id);
-            return Optional.of(user);
-        } catch (NoResultException e) {
-            return Optional.empty();
         }
     }
 }

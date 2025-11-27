@@ -1,5 +1,6 @@
 package com.el_jobru.models.level;
 
+import com.el_jobru.models.BaseObject;
 import com.el_jobru.models.user.User;
 import jakarta.persistence.*;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "levels")
-public class Level {
+public class Level implements BaseObject<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +23,6 @@ public class Level {
     @Column(name = "max_xp")
     private long maxXp;
 
-    @OneToMany(mappedBy = "lvl")
-    private List<User> users;
-
     public Level() {}
 
     public Level(String name, long minXp, long maxXp) {
@@ -33,6 +31,7 @@ public class Level {
         this.maxXp = maxXp;
     }
 
+    @Override
     public Integer getId() {
         return id;
     }

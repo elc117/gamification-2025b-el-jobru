@@ -6,7 +6,6 @@ import com.el_jobru.models.book.Book;
 import com.el_jobru.repository.BookRepository;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class BookService {
@@ -17,10 +16,9 @@ public class BookService {
     }
 
     public Book registerBook(RegisterBookDTO bookDTO) throws Exception {
-
         Book book = new Book(bookDTO.title(), bookDTO.author());
 
-        return bookRepository.save(book);
+        return bookRepository.saveOrUpdate(book);
     }
 
     public List<BookResponseDTO> getAllBooks() {
@@ -30,5 +28,4 @@ public class BookService {
                 .map(BookResponseDTO::new)
                 .collect(Collectors.toList());
     }
-
 }

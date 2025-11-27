@@ -1,11 +1,12 @@
 package com.el_jobru.models.mission;
 
+import com.el_jobru.models.BaseObject;
 import com.el_jobru.models.level.Level;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "missions")
-public class Mission {
+public class Mission implements BaseObject<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +37,7 @@ public class Mission {
         this.minLevel = minLevel;
     }
 
+    @Override
     public Integer getId() {
         return id;
     }

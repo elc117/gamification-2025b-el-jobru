@@ -7,6 +7,8 @@ import com.el_jobru.service.DiaryService;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 
+import java.util.List;
+
 public class DiaryController {
     private DiaryService diaryService;
 
@@ -26,8 +28,14 @@ public class DiaryController {
         }
     }
 
-    public void registerChapter(Context ctx) {
+    public void getAll(Context ctx) {
+        try {
+            List<DiaryResponseDTO> diaries = diaryService.getAll(ctx.attribute("currentUser"));
 
+            ctx.status(200).json(diaries);
+        } catch (Exception e) {
+            throw new BadRequestResponse("Erro: " + e);
+        }
     }
 
 }

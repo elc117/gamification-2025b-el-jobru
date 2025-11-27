@@ -46,7 +46,7 @@ public class AuthMiddleware {
         }
 
         // Busca o usuário no banco
-        Optional<User> userOpt = userRepository.findById(userId);
+        Optional<User> userOpt = userRepository.findById(userId, User.class);
         if (userOpt.isEmpty()) {
             throw new UnauthorizedResponse("Usuário do token não encontrado");
         }

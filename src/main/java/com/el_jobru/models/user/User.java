@@ -1,17 +1,19 @@
 package com.el_jobru.models.user;
 
+import com.el_jobru.models.BaseObject;
 import com.el_jobru.models.book.Book;
 import com.el_jobru.models.level.Level;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements BaseObject<UUID> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false, unique = true)
@@ -40,10 +42,6 @@ public class User {
     @AttributeOverride(name = "value", column = @Column(name = "age"))
     private Age age;
 
-    @ManyToOne
-    @JoinColumn(name = "level_id")
-    private Level lvl;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_books",
@@ -54,16 +52,16 @@ public class User {
 
     public User() {}
 
-    public User(Age age, String name, Long exp, Email email, Password password, UserRole role, Level lvl){
+    public User(Age age, String name, Email email, Password password, UserRole role){
         this.age = age;
         this.name = name;
-        this.exp = exp;
+        this.exp = 0L;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.lvl = lvl;
     }
 
+    @Override
     public UUID getId() {
         return id;
     }
@@ -76,7 +74,7 @@ public class User {
         this.name = name;
     }
 
-    public Long getExp() { return exp; }
+    public Long getExp() { return Objects.requireNonNullElse(exp, 0L); }
 
     public void setExp(Long exp) { this.exp = exp; }
 
@@ -111,10 +109,6 @@ public class User {
     public void setRole(UserRole role) {
         this.role = role;
     }
-
-    public Level getLvl() { return lvl; }
-
-    public void setLvl(Level lvl) { this.lvl = lvl; }
 
     public Set<Book> getBooks() {
         return books;

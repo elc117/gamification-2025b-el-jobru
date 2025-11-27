@@ -3,7 +3,8 @@ package com.el_jobru.controller;
 import com.el_jobru.dto.auth.LoginDTO;
 import com.el_jobru.dto.auth.LoginResponseDTO;
 import com.el_jobru.dto.auth.RegisterDTO;
-import com.el_jobru.dto.mission.MissionDTO;
+import com.el_jobru.dto.level.LevelResponseDTO;
+import com.el_jobru.dto.profile.ClaimMissionResponseDTO;
 import com.el_jobru.dto.profile.ProfileResponseDTO;
 import com.el_jobru.models.user.User;
 import com.el_jobru.security.JwtUtil;
@@ -77,13 +78,30 @@ public class UserController {
 
     public void accomplishedMission(Context ctx) {
         try {
-            MissionDTO missionDTO = ctx.bodyAsClass(MissionDTO.class);
+            Integer missionId = Integer.valueOf(ctx.pathParam("missionId"));
 
-            ProfileResponseDTO profile = userService.claimMission(missionDTO, ctx.attribute("currentUser"));
+            ClaimMissionResponseDTO profile = userService.claimMission(missionId, ctx.attribute("currentUser"));
 
             ctx.status(HttpStatus.CREATED).json(profile);
         } catch (Exception e) {
-            throw new BadRequestResponse("Erro: " + e);
+            throw new BadRequestResponse("Erro: " + e.getMessage());
+        }
+    }
+
+    public void getLevel(Context ctx) {
+        try {
+            User currentUser = ctx.attribute("currentUser");
+
+            if (currentUser == null) {
+                throw new UnauthorizedResponse("Usuário não encontrado no contexto da requisição.");
+            }
+
+            LevelResponseDTO level = userService.getUserLevel(currentUser.getExp());
+
+            ctx.status(HttpStatus.OK).json(level);
+
+        } catch (Exception e) {
+            throw new NotFoundResponse(e.getMessage());
         }
     }
 }

@@ -69,29 +69,32 @@ public class MainApplication {
 
         app.beforeMatched(ctx -> authMiddleware(ctx, tokenService, userRepository));
 
-        app.get("/", ctx -> ctx.result("Hello, world"));
+        app.get("/", ctx -> ctx.result("Hello, world!"));
         app.get("/hello", ctx -> ctx.result("Bem-vindo"), UserRole.USER);
 
         app.post("/register", userController::register, UserRole.ANYONE);
         app.post("/login", userController::login, UserRole.ANYONE);
 
         app.get("/profile", userController::getProfile, UserRole.USER, UserRole.ADMIN);
+        app.get("/profile/level", userController::getLevel, UserRole.USER, UserRole.ADMIN);
         app.patch("/profile/book", userController::addBook, UserRole.USER, UserRole.ADMIN);
-        app.patch("/mission/claim", userController::accomplishedMission, UserRole.USER, UserRole.ADMIN);
 
         app.get("/admin/dashboard", ctx -> ctx.status(HttpStatus.OK).result("Bem-vindo, Admin"), UserRole.ADMIN);
 
         app.get("/book", bookController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/book", bookController::register, UserRole.USER, UserRole.ADMIN);
 
+        app.get("/diary", diaryController::getAll, UserRole.USER, UserRole.ADMIN);
         app.post("/diary", diaryController::register, UserRole.USER, UserRole.ADMIN);
 
+        app.get("/chapter/{diaryId}", chapterController::getDiaryAll, UserRole.USER, UserRole.ADMIN);
         app.post("/chapter", chapterController::register, UserRole.USER, UserRole.ADMIN);
-      
+
         app.post("/level", levelController::register, UserRole.ADMIN);
         app.get("/level", levelController::getAll, UserRole.USER, UserRole.ADMIN);
 
         app.post("/mission", missionController::register, UserRole.ADMIN);
         app.get("/mission", missionController::getAll, UserRole.USER, UserRole.ADMIN);
+        app.patch("/mission/claim/{missionId}", userController::accomplishedMission, UserRole.USER, UserRole.ADMIN);
     }
 }
