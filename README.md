@@ -43,7 +43,7 @@ A execução do programa deve seguir os seguintes passos (usando codespaces):
     ```bash
    java -jar ./target/el-jobru-1.0.jar
    ```
-
+![Gif de execução](https://github.com/elc117/gamification-2025b-el-jobru/blob/main/assets/APIRodando.gif)
 
 # Fontes
 BAELDUNG. Baeldung . Disponível em: https://www.baeldung.com/.
