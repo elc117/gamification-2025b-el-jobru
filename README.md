@@ -21,6 +21,7 @@ Durante os trabalhos, o Bruno, que já tinha muito mais mais experiência com Ja
 
 Apesar das dificuldades, acho que tanto eu quanto o meu colega fizemos o possível com a condição em que nós estivemos nesses tempos. No meu caso, ainda preciso me acostumar com as ideias de orientação a objetos.
 ## Relato: O Cara da TI 2
+De modo geral, o desenvolvimento do projeto fluiu bem e não encontrei grandes dificuldades na implementação da lógica. Os principais desafios concentraram-se na etapa de infraestrutura e configuração de ambiente. Tive obstáculos específicos para configurar o container visando o deploy no Render e na preparação da pasta `.devcontainer` para a execução correta no GitHub Codespaces. No entanto, através de estudo da documentação e utilizando a IA como ferramenta de apoio para diagnóstico e correção de erros, consegui contornar essas questões e finalizar o ambiente com sucesso.
 
 ## Diagrama de Classes
 OBS: Como o diagrama é muito grande, eu recomendo baixar a imagem para poder dar zoom e navegar livremente por ele. Foi feito no IntelliJ :D
@@ -33,11 +34,12 @@ A execução do programa deve seguir os seguintes passos (usando codespaces):
    sudo apt-get update
    sudo apt-get install -y maven
    ```
-2. Geração do jar
+2. Copie o `.env.example` para um arquivo chamado `.env`
+3. Geração do jar
     ```bash
    mvn clean install
    ```
-3. Executar jar
+4. Executar jar
     ```bash
    java -jar ./target/el-jobru-1.0.jar
    ```
